@@ -7,7 +7,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, Bidirectional
 from keras.layers import  Masking
 from scipy.interpolate import UnivariateSpline,CubicSpline
-output = 'C:/Users/yihao/Dropbox/Research/Deep_Learning/figs/'
+output = 'C:/Users/yihao/Dropbox/Research/ADCP/figs/'
 #---------------------------data analysis-------------------------------------
 # flattern the batch time series data into a m by n matrix
 # m= p.shape[1]: number of sensors, n=p.shape[0]*p.shape[2]: time steps
