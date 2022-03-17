@@ -11,22 +11,23 @@ print(getwd())
 source('./util_fncs.R')
 
 init_pwc_write = TRUE
+create_grid_plot = FALSE
 
-results_dir = '../figures/PaperRevision/normalised/'
+results_dir = './figures/'
 
 ## List the pertinent directories that store data, spatial results, amlp results, lale results...
 # input data
-raw_data_dir = '../lale_experiments/data/interpolated_data/'
+raw_data_dir = '../sensor_data/interpolated_data/'
 ## Spatial data dir
-spat_dir = '../spatial_experiments/Data/Diff/'
-# Lale dire
-lale_dir = '../lale_experiments/results/lale/normalised/'
+dl_dir = '../deep_learning_experiments/prediction/'
+# Lale data dire
+lale_dir = '../machine_learning_experiments//autoAI_experiments//results/'
 # AMLP dir
-amlp_dir = '../amlp_experiments/'
+amlp_dir = '../machine_learning_experiments/amlp/results/'
 
 ## Load the raw and SPATIAL results.
 ### Files we use are (from Yihao)
-sensors_to_use <- list(c(9), c(9), c(2)) # for temperature, oxy, and adcp respectively
+sensors_to_use <- list(c(9), c(9), c(4)) # for temperature, oxy, and adcp respectively
 sensor_stem_list <- c('Temp_Sensor_', 'Oxygen_Sensor_', 'ADCP_Sensor_')
 spat_stem_list <- c('Diff_Temp_aqme_proc-mcnuttsisland_cage-19-',
                     'Diff_dissolved_oxygen_aqme_proc-mcnuttsisland_cage-19-',
@@ -36,7 +37,7 @@ lale_sensor_dir = c('temperature/', 'oxygen/', 'adcp/')
 amlp_sensor_dir = c('temp/', 'oxygen/', 'adcp/')
 
 
-for (sens_type in seq(1, 3)){ #length(lale_sensor_dir))){ # this selects temp, oxy or ADCP
+for (sens_type in seq(3, 3)){ # We just focus 
   if (sens_type == 3){
     ADCP = TRUE
     } else {
@@ -48,8 +49,8 @@ for (sens_type in seq(1, 3)){ #length(lale_sensor_dir))){ # this selects temp, o
   raw_data_fname <-  paste(paste(sensor_stem_list[sens_type], 
                                  sens_extract, sep=''), '.csv', sep = '')
   # 2) spatial data files
-  spatial_fname <-  paste(paste(spat_stem_list[sens_type], 
-                                sens_extract, sep=''), 'prediction.csv', sep = '')
+  spatial_fname <-  paste(paste(sensor_stem_list[sens_type], 
+                                sens_extract, sep=''), '_SPATIAL_prediction.csv', sep = '')
   # 3) Lale data files
   lale_fname <- paste(paste(sensor_stem_list[sens_type], 
                             sens_extract, sep = ''), '_pred.csv', sep='')
@@ -57,13 +58,23 @@ for (sens_type in seq(1, 3)){ #length(lale_sensor_dir))){ # this selects temp, o
   amlp_fname <- paste(paste(sensor_stem_list[sens_type], 
                             sens_extract, sep = ''), '.prediction', sep='')
   
+  # 5) CNN data files
+  cnn_fname <-  paste(paste(sensor_stem_list[sens_type], 
+                            sens_extract, sep=''), '_CNN_prediction.csv', sep = '')
+  
+  # 6) LSTM data files
+  lstm_fname <-  paste(paste(sensor_stem_list[sens_type], 
+                             sens_extract, sep=''), '_LSTM_prediction.csv', sep = '')
+  
+  
+  
   for (id_loop in seq(1, length(sens_extract))){
     sens_id <- sens_extract[id_loop]
     sens_id <- sens_extract[id_loop]
     sensor_fname = here(getwd(), raw_data_dir, raw_data_fname[id_loop])
     residual_fname = here(getwd(), lale_dir, lale_sensor_dir[sens_type], lale_fname[id_loop])
     amlp_fname_ = here(getwd(), amlp_dir, amlp_sensor_dir[sens_type], amlp_fname[id_loop])
-    spat_fname_ = here(getwd(), spat_dir, spatial_fname[id_loop])
+    spat_fname_ = here(getwd(), dl_dir, spatial_fname[id_loop])
     print(sensor_fname)  
     print(residual_fname)
     if (sens_type == 3){ADCP_FLAG=TRUE}
@@ -159,24 +170,19 @@ for (sens_type in seq(1, 3)){ #length(lale_sensor_dir))){ # this selects temp, o
   
 }
 
-g = ggarrange(bxp_temp +  labs(y= expression('Temperature ('*~degree*C*')')) ,
-              bxp_do + labs(y = 'DO (mg/L)'),
-              bxp_adcp + labs(y = 'Speed (cm/s)') +
-                ylim(c(0,20)),
-              nrow = 1, ncol=3, common.legend = T)
-
-ggsave(here(getwd(), results_dir, 'boxplot_all.png') ,g, height=4.8, width=6.4)
-
-
-
-plot(df$date, df$output.x, type='l')
-lines(df$date, df$output.y, col = 'red')
-lines(df$date, df$AMLP, col = 'green')
-lines(df$date, df$SPATIAL, col = 'blue')
-lines(df$date, df$AutoAI, col = 'black')
+if (create_grid_plot){
+  g = ggarrange(bxp_temp +  labs(y= expression('Temperature ('*~degree*C*')')) ,
+                bxp_do + labs(y = 'DO (mg/L)'),
+                bxp_adcp + labs(y = 'Speed (cm/s)') +
+                  ylim(c(0,20)),
+                nrow = 1, ncol=3, common.legend = T)
+  
+  ggsave(here(getwd(), results_dir, 'boxplot_all.png') ,g, height=4.8, width=6.4)
+  
+}
 
 
-head(df, 3)
+
 
 ndays <- 7  # number of days to include for analysis
 df_model <- df_model[1:(48*ndays),]
@@ -190,10 +196,6 @@ gdf %>%
   group_by(date) %>%
   get_summary_stats(value, type = "mean_sd")
 
-bxp <- ggboxplot(gdf, x = "variable", y = "value", xlab = "Variable",
-                 ylab = expression('Temperature ('*~degree*C*')'),
-                 order = c("observation", "SPATIAL", "AutoAI", "AMLP"))#, add = "point")
-bxp
 
 gdf %>%
   group_by(variable) %>%
@@ -201,11 +203,6 @@ gdf %>%
 
 
 
-ggqqplot(gdf, "value", facet.by = "variable")
-
-
-res.aov <- anova_test(data = gdf, dv = value, wid = date, within = variable)
-get_anova_table(res.aov)
 
 
 # pairwise comparisons
@@ -235,41 +232,3 @@ if (init_pwc_write){
 }
 
 
-
-p_ts <- ggplot(data=gdf,aes(x=as.POSIXct(date),y=value,color=variable)) +
-  geom_point() + geom_line() +  labs(x = "")
-p_ts
-p_dens <- gdf %>%
-  ggplot( aes(x=value, fill=variable)) +
-  geom_density( color="#e9ecef", alpha=0.45, position = 'identity') +
-  labs(fill="")
-p_dens
-fname_ts = paste(paste(paste('TimeSeries_', sensor_stem, sep = ''),
-                       sens_id, sep = ''), '.png', sep='')
-fname_dens = paste(paste(paste('DensityPlot', sensor_stem, sep = ''), 
-                         sens_id, sep = ''), '.png', sep='')
-
-ggsave(here(getwd(), results_dir, fname_ts),p_ts)
-ggsave(here(getwd(), results_dir, fname_dens), p_dens)
-
-
-### I don't really know why this doesn't work
-#stat.test <- df_model %>%  t_test(SPATIAL ~ AutoAI, paired=TRUE) %>%
-#  add_significance()
-
-
-bxp <- ggpaired(gdf, x = "variable", y = "value", 
-                order =  c("observation", "SPATIAL", "AutoAI", "AMLP"),
-                ylab = "Weight", xlab = "Groups")
-
-pwc <- gdf %>%
-  pairwise_t_test(
-    value ~ variable, paired = TRUE,
-    p.adjust.method = "bonferroni"
-  )
-effect_size <- gdf  %>% cohens_d(value ~ variable, paired = TRUE)
-
-stat.test <- gdf  %>% 
-  t_test(value ~ variable, paired = TRUE) %>%
-  add_significance()
-stat.test
