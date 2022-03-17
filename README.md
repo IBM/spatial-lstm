@@ -1,5 +1,8 @@
 # spatial-lstm
 Repo related to our AAAI 2021 paper "A spatio-temporal LSTM model to forecast across multiple temporal and spatial scales".
+Contact details:
+ - Fearghal O'Donncha (feardonn@ie.ibm.com)
+ - Yihao Hu ()
 
 This repo includes three subdirectories
  - `sensor_data` sensor or observation data used in the study. For data ownership reasons we could only make ADCP data publicly available. Repo is structured to implement all experiments on that dataset. For those interested in a more detailed exploration of the work, please contact the authors to get access to temperature and oxygen data used in study
