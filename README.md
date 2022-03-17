@@ -9,3 +9,4 @@ This repo includes three subdirectories
  - `machine_learning_experiments` - scripts to run two different machine learning experiments on the data. We use two popular AutoAI frameworks to generate the two implementations, namely [Lale](https://github.com/iBM/lale) and [AutoMLPipeline or AMLP](https://github.com/IBM/AutoMLPipeline.jl).
  - `deep_learning_experiments` scripts to run deep learning experinments used in the paper, namely CNN, LSTM, and bidirectional LSTM model that we term SPATIAL
  - `plots` R scripts to visualise and statistically analyse model results
+=======
