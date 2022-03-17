@@ -134,7 +134,8 @@ for (sens_type in seq(3, 3)){ # We just focus
     }
     
     if (sens_type == 3){
-      bxp_adcp <- bxp
+      bxp_adcp <- bxp + labs(y = 'Speed (cm/s)') +
+        ylim(c(0,20))
       r_adcp <- rcorr(data_rcorr)
       
     }
@@ -200,8 +201,6 @@ gdf %>%
 gdf %>%
   group_by(variable) %>%
   identify_outliers(value)
-
-
 
 
 
