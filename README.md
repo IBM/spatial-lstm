@@ -1,5 +1,5 @@
 # spatial-lstm
-Repo related to our AAAI 2021 paper "A spatio-temporal LSTM model to forecast across multiple temporal and spatial scales".
+Repo related to our Ecological Informatics paper [A spatio-temporal LSTM model to forecast across multiple temporal and spatial scales](https://www.sciencedirect.com/science/article/pii/S1574954122001376?casa_token=Sgd5WcZLtu8AAAAA:4h_h0x_vQhmVDccgCSlWDt6MSnqInCHLsliH4iesdLJczCrK5GqpXfO4u2I15gOTiPKerYQCNtc).
 Contact details:
  - Fearghal O'Donncha (feardonn@ie.ibm.com)
  - Yihao Hu ()
